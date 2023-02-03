@@ -1,7 +1,6 @@
 use k256::{
     schnorr::{signature::hazmat::PrehashVerifier, SigningKey},
     sha2::{Digest, Sha256},
-    PublicKey,
 };
 use rand::rngs::OsRng;
 use schnorr_rs::signature::{AdaptorSigner, RepairAdaptorSignature, SecretExtractor};
@@ -12,12 +11,12 @@ fn test_adaptor_repair() {
 
     let bob_secret_key = SigningKey::random(&mut OsRng);
 
-    let bob_secret_pubkey: PublicKey = bob_secret_key.verifying_key().into();
+    let bob_secret_pubkey = bob_secret_key.verifying_key();
 
     let harshed = Sha256::new().chain_update(b"hello").finalize().into();
 
     let tweaked_signature = alice_signin_key
-        .adaptor_sign_with_rng(&mut OsRng, &bob_secret_pubkey, &harshed)
+        .sign_with_rng(&mut OsRng, &bob_secret_pubkey, &harshed)
         .expect("Sign");
 
     let verify_key = alice_signin_key.verifying_key();
@@ -27,7 +26,7 @@ fn test_adaptor_repair() {
         .expect_err("Tweaked signature must not passed");
 
     let signature = verify_key
-        .repair_adaptor_signature(&harshed, &tweaked_signature, &bob_secret_key)
+        .repair_signature(&harshed, &tweaked_signature, &bob_secret_key)
         .expect("Repair");
 
     verify_key

@@ -17,10 +17,10 @@ use crate::{
 };
 
 impl AdaptorSigner for SigningKey {
-    fn adaptor_sign_with_rng<RNG>(
+    fn sign_with_rng<RNG>(
         &self,
         rng: &mut RNG,
-        t: &k256::PublicKey,
+        t: &VerifyingKey,
         msg_digest: &[u8; 32],
     ) -> anyhow::Result<k256::schnorr::Signature>
     where
@@ -71,7 +71,7 @@ impl AdaptorSigner for SigningKey {
 }
 
 impl RepairAdaptorSignature for VerifyingKey {
-    fn repair_adaptor_signature(
+    fn repair_signature(
         &self,
         msg_digest: &[u8; 32],
         adaptor_sig: &Signature,
