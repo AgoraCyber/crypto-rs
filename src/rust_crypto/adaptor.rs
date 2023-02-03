@@ -3,7 +3,6 @@
 use k256::{
     elliptic_curve::{
         ops::{LinearCombination, Reduce},
-        subtle::ConstantTimeEq,
         AffineXCoordinate,
     },
     schnorr::{CryptoRngCore, Signature, SigningKey, VerifyingKey},
@@ -109,7 +108,8 @@ impl RepairAdaptorSignature for VerifyingKey {
         let r_expect =
             ProjectivePoint::lincomb(&ProjectivePoint::GENERATOR, &s_star, &y, &-e).to_affine();
 
-        if r_expect.ct_eq(&r_star.to_affine()).into() {
+        // check if generated R' Y Coordinate is not odd
+        if r_expect == r_star.to_affine() {
             let s = *s_star + **secret_key.as_nonzero_scalar();
 
             // Workaround to create Signature structure instance outside of `k256` crate
@@ -142,5 +142,51 @@ impl SecretExtractor for Signature {
         let s = NonZeroScalar::try_from(s_bytes)?;
 
         Option::from(NonZeroScalar::new(*s - *s_star)).ok_or(SchnorrError::NonZeroScalar.into())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use k256::{
+        elliptic_curve::{
+            sec1::{FromEncodedPoint, ToEncodedPoint},
+            subtle::Choice,
+        },
+        schnorr::{SigningKey, VerifyingKey},
+        EncodedPoint, FieldElement, PublicKey,
+    };
+    use rand::rngs::OsRng;
+
+    #[test]
+    fn test_odd() {
+        _ = pretty_env_logger::try_init();
+
+        let key = SigningKey::random(&mut OsRng);
+
+        let point = key.verifying_key().as_affine().to_encoded_point(false);
+
+        let pub_key = PublicKey::from_encoded_point(&point).unwrap();
+
+        let y = FieldElement::from_bytes(point.y().unwrap()).unwrap();
+
+        assert_eq!(
+            bool::from(y.normalize().is_odd()),
+            bool::from(Choice::from(0))
+        );
+
+        VerifyingKey::try_from(pub_key).expect("Convert even point to verify key");
+
+        let y = -y;
+
+        assert_eq!(
+            bool::from(y.normalize().is_odd()),
+            bool::from(Choice::from(1))
+        );
+
+        let point = EncodedPoint::from_affine_coordinates(point.x().unwrap(), &y.to_bytes(), false);
+
+        let pub_key = PublicKey::from_encoded_point(&point).unwrap();
+
+        VerifyingKey::try_from(pub_key).expect_err("From odd point is not allowed");
     }
 }

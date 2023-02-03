@@ -1,5 +1,6 @@
 //! Trait types for signature methods
 
+#[cfg(feature = "rust_crypto")]
 use k256::{
     schnorr::{CryptoRngCore, Signature, SigningKey},
     NonZeroScalar, PublicKey,

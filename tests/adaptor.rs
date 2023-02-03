@@ -46,3 +46,5 @@ fn test_adaptor_repair() {
         "Shared secret"
     );
 }
+
+// TODO: test if check odd R
