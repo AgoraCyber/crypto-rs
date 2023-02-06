@@ -10,7 +10,7 @@ use k256::{
     AffinePoint, FieldElement, NonZeroScalar, ProjectivePoint, Scalar, U256,
 };
 
-use crate::{
+use crate::schnorr::{
     error::SchnorrError,
     random::{synthetic_random, tagged_hash, CHALLENGE_TAG},
     signature::{AdaptorSigner, RepairAdaptorSignature, SecretExtractor},

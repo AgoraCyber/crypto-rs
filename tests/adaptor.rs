@@ -1,9 +1,9 @@
+use agora_crypto_rs::schnorr::signature::{AdaptorSigner, RepairAdaptorSignature, SecretExtractor};
 use k256::{
     schnorr::{signature::hazmat::PrehashVerifier, SigningKey},
     sha2::{Digest, Sha256},
 };
 use rand::rngs::OsRng;
-use schnorr_rs::signature::{AdaptorSigner, RepairAdaptorSignature, SecretExtractor};
 
 #[test]
 fn test_adaptor_repair() {
