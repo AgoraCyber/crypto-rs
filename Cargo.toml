@@ -14,6 +14,8 @@ thiserror = "1.0.38"
 k256 = { version = "^0.12", optional = true, features = ["expose-field"] }
 rand = { version = "^0.8.5", features = ["getrandom"], optional = true }
 
+# openssl 
+openssl = { version = "0.10", features = ["vendored"], optional = true }
 
 [dev-dependencies]
 log = "0.4.16"
