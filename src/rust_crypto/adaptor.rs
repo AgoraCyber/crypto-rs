@@ -17,7 +17,7 @@ use crate::{
 };
 
 impl AdaptorSigner for SigningKey {
-    fn sign_with_rng<RNG>(
+    fn adaptor_sign_with_rng<RNG>(
         &self,
         rng: &mut RNG,
         t: &VerifyingKey,
@@ -71,7 +71,7 @@ impl AdaptorSigner for SigningKey {
 }
 
 impl RepairAdaptorSignature for VerifyingKey {
-    fn repair_signature(
+    fn repair_tweaked_signature(
         &self,
         msg_digest: &[u8; 32],
         adaptor_sig: &Signature,

@@ -19,7 +19,7 @@ pub trait AdaptorSigner {
     /// For compatibility with [`BIP340`](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki),
     /// only those public key whose [`point`](k256::AffinePoint) is an even point are acceptable,
     /// on the other hand [`VerifyingKey`] offers this type of guarantee.
-    fn sign_with_rng<RNG>(
+    fn adaptor_sign_with_rng<RNG>(
         &self,
         rng: &mut RNG,
         t: &VerifyingKey,
@@ -28,10 +28,10 @@ pub trait AdaptorSigner {
     where
         RNG: CryptoRngCore;
 }
-
+/// Type trait provide tweaked signature repairing service.
 pub trait RepairAdaptorSignature {
     /// Try assmble taproot Schnorr signature `(R,s)` with payment secret from tweaked signature `(R',s')`,
-    fn repair_signature(
+    fn repair_tweaked_signature(
         &self,
         msg_digest: &[u8; 32],
         adaptor_sig: &Signature,

@@ -16,7 +16,7 @@ fn test_adaptor_repair() {
     let harshed = Sha256::new().chain_update(b"hello").finalize().into();
 
     let tweaked_signature = alice_signin_key
-        .sign_with_rng(&mut OsRng, &bob_secret_pubkey, &harshed)
+        .adaptor_sign_with_rng(&mut OsRng, &bob_secret_pubkey, &harshed)
         .expect("Sign");
 
     let verify_key = alice_signin_key.verifying_key();
@@ -26,7 +26,7 @@ fn test_adaptor_repair() {
         .expect_err("Tweaked signature must not passed");
 
     let signature = verify_key
-        .repair_signature(&harshed, &tweaked_signature, &bob_secret_key)
+        .repair_tweaked_signature(&harshed, &tweaked_signature, &bob_secret_key)
         .expect("Repair");
 
     verify_key
